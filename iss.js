@@ -1,3 +1,18 @@
+/*
+STEPs:
+* Fetch our IP Address
+* Fetch the geo coordinates (Latitude & Longitude) for our IP
+* Fetch the next ISS flyovers for our geo coordinates
+*/
+
+
+// * FETCH IP ADDRESS
+
+//this function will fetch and return an ip address from an API ansynchronously
+//inpt is api link.. output is either error or the ip address itself.. 
+// output gotten asynchronously will be passed onto a callback function.
+//will use ansynch method 'http request' to talk to the API link
+
 const request = require('request');
 
 const fetchMyIP = function(callback) {
@@ -29,6 +44,7 @@ const fetchCoordsByIP = function(ip, callback) {
       const message = `Success status was ${JSON.parse(body).success}. Server message says: ${JSON.parse(body).message} when fetching for IP ${JSON.parse(body).ip}`;
       return callback(Error(message), null);
     }
+    
     if (JSON.parse(body)["success"]) {
       return callback(null, { latitude: JSON.parse(body)["latitude"], longitude: JSON.parse(body)["longitude"] });
     }
@@ -56,20 +72,9 @@ const fetchISSFlyOverTimes = function(coords, callback) {
 };
 
 
-/**
- * Orchestrates multiple API requests in order to determine the next 5 upcoming ISS fly overs for the user's current location.
- * Input:
- *   - A callback with an error or results.
- * Returns (via Callback):
- *   - An error, if any (nullable)
- *   - The fly-over times as an array (null if error):
- *     [ { risetime: <number>, duration: <number> }, ... ]
- */
 const nextISSTimesForMyLocation = function(callback) {
   fetchMyIP((error, ip) => {
-    if (error) {
-      return callback(error, null);
-    }
+    if (error) { return callback(error, null); }
 
     fetchCoordsByIP(ip, (error, loc) => {
       if (error) {
@@ -88,4 +93,4 @@ const nextISSTimesForMyLocation = function(callback) {
 };
 
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation };
+module.exports = { nextISSTimesForMyLocation };
